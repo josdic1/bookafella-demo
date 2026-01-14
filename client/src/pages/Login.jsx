@@ -1,75 +1,96 @@
-// client/src/pages/Login.jsx
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect, useContext } from "react";
+import { useContext, useState } from "react";
 import CurrentUserContext from "../contexts/CurrentUserContext";
-import MemberContext from "../contexts/MemberContext";
 
 function Login() {
-    const { members } = useContext(MemberContext);
     const { handleLogin } = useContext(CurrentUserContext);
-
-    const [formData, setFormData] = useState({
-        member: ""
-    });
-
-    // Initialize user state carefully. It should not be derived directly in useEffect
-    // if it also serves as a dependency for that same effect in a way that causes loops.
-    // It's better to use a state that holds the *potential* user and set it once.
-    const [potentialUser, setPotentialUser] = useState(null); // Use null initially
-
-    // This effect finds the matching member based on formData.member and members list
-    useEffect(() => {
-        const match = members.find(m => (
-            m.member.toLowerCase() === formData.member.toLowerCase()
-        ));
-        // Only update potentialUser if it's truly different to prevent unnecessary re-renders
-        if (match && (!potentialUser || potentialUser.id !== match.id)) {
-            setPotentialUser(match);
-        } else if (!match && potentialUser) { // If no match and potentialUser was previously set
-            setPotentialUser(null);
-        }
-    }, [members, formData.member, potentialUser]); // Dependencies: members list and input field value
-
     const navigate = useNavigate();
+    const [showHelp, setShowHelp] = useState(false);
 
-    const onFormChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+    // Demo users
+    const demoAdmin = { id: "r4gt", member: "admin", role: "admin" };
+    const demoUser = { id: "ed65", member: "josh", role: "user" };
+
+    const loginAs = (user) => {
+        handleLogin(user);
+        navigate('/home');
     };
-
-    const onSubmit = (e) => {
-        e.preventDefault();
-        // Use potentialUser here, which is updated by the useEffect
-        if (potentialUser) {
-            handleLogin(potentialUser); // Pass the found user object
-            navigate('/home');
-            onClear();
-        } else {
-            console.error("Login failed: User not found.");
-            // Optionally show a user-friendly message in the UI
-        }
-    };
-
-    function onClear() {
-        setFormData({
-            member: ""
-        });
-        setPotentialUser(null); // Clear potential user as well
-    }
 
     return (
-        <>
-            <form onSubmit={onSubmit}>
-                <label htmlFor="member">🔒 </label>
-                <input type="text" name="member" id="member" onChange={onFormChange} value={formData.member} placeholder="User Login..." />
-                {/* Only show login button if a potential user is found */}
-                {potentialUser ?    <button class="btn btn-success" type="submit">Login</button> :    <button class="btn btn-dark" disabled>Enter Username</button>}
-                <button class="btn btn-light" type="button" onClick={onClear}> Clear </button>
-            </form>
-        </>
+        <div className="login-container">
+            <div className="login-card">
+                <div className="login-header">
+                    <h1>📅 Bookafella</h1>
+                    <p className="login-subtitle">Private Members Club Reservation System</p>
+                </div>
+
+                <div className="login-body">
+                    <h2>Demo Login</h2>
+                    <p>Select a role to explore the app:</p>
+                    
+                    <div className="login-buttons">
+                        <button 
+                            className="btn btn-admin" 
+                            onClick={() => loginAs(demoAdmin)}
+                        >
+                            <span className="btn-icon">👑</span>
+                            <span className="btn-text">
+                                <strong>Login as Admin</strong>
+                                <small>Full access to all features</small>
+                            </span>
+                        </button>
+                        
+                        <button 
+                            className="btn btn-member" 
+                            onClick={() => loginAs(demoUser)}
+                        >
+                            <span className="btn-icon">👤</span>
+                            <span className="btn-text">
+                                <strong>Login as Member</strong>
+                                <small>Book reservations as Josh</small>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+
+                <div className="login-footer">
+                    <button className="help-link" onClick={() => setShowHelp(true)}>
+                        ❓ How does this app work?
+                    </button>
+                </div>
+            </div>
+
+            {/* Help Modal */}
+            {showHelp && (
+                <div className="modal-overlay" onClick={() => setShowHelp(false)}>
+                    <div className="modal-content" onClick={e => e.stopPropagation()}>
+                        <button className="modal-close" onClick={() => setShowHelp(false)}>&times;</button>
+                        
+                        <h2>📅 About Bookafella</h2>
+                        
+                        <p>A reservation management system for exclusive private members clubs.</p>
+                        
+                        <h3>👑 Admin Features:</h3>
+                        <ul>
+                            <li>View and manage all reservations</li>
+                            <li>Add, edit, and remove members</li>
+                            <li>Full CRUD access to all data</li>
+                        </ul>
+                        
+                        <h3>👤 Member Features:</h3>
+                        <ul>
+                            <li>Book new reservations</li>
+                            <li>View and manage your bookings</li>
+                            <li>Edit your profile</li>
+                        </ul>
+                        
+                        <div className="modal-note">
+                            <strong>Demo Mode:</strong> Changes are saved during your session but reset on page refresh.
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 }
 

@@ -67,7 +67,7 @@ function Dashboard() {
                         <h3>Quick Actions:</h3>
                         <ul className="action-list"> {/* Use a ul for lists of buttons */}
                             <li><button className="btn btn-primary" onClick={() => navigate('/reservationlist')}>View All Reservations</button></li>
-                            <li><button className="btn btn-secondary" onClick={() => navigate('/members')}>Manage All Members</button></li>
+                            <li><button className="btn btn-secondary" onClick={() => navigate('/memberlist')}>Manage All Members</button></li>
                             <li><button className="btn btn-primary" onClick={() => navigate('/new/reservation')}>Create New Reservation</button></li>
                             {/* Add more admin-specific links/buttons here */}
                         </ul>
@@ -102,7 +102,7 @@ function Dashboard() {
                             <li><button className="btn btn-secondary" onClick={() => navigate('/new/reservation')}>Make a New Reservation</button></li>
                         </ul>
                         {/* Display a quick count of *their* reservations */}
-                        <p className="reservation-count-summary">You have <strong>{reservations.filter(res => res.member_id === currentMemberId).length}</strong> active reservations.</p>
+                       <p className="reservation-count-summary">You have <strong>{reservations.filter(res => res.member_id === currentMemberId && new Date(res.arrival) >= new Date()).length}</strong> upcoming reservations.</p>
                     </div>
                 </div>
             )}

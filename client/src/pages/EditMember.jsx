@@ -15,8 +15,7 @@ function EditMember() {
         role: ""
     });
 
-    // Console log for debugging (keep this for now, it's helpful!)
-    console.log("EditMember Render - Debug:", { idFromParams: id, membersArray: members, isLoading: loading });
+
 
     // --- useEffect to populate formData ---
     // This effect is now at the top level and will always be called.
